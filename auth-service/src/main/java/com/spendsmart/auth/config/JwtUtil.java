@@ -3,27 +3,36 @@ package com.spendsmart.auth.config;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
 import java.nio.charset.StandardCharsets;
 import java.util.Date;
 
+/**
+ * JWT utility — secret and expiry are now read from application.properties
+ * (jwt.secret and jwt.expiry) instead of being hardcoded.
+ */
 @Component
 public class JwtUtil {
 
-    private static final String SECRET = "spendsmart_secret_key_must_be_32chars!!";
-    private static final long EXPIRY = 86400000L;
+    // ✅ UPDATED — externalized from application.properties
+    @Value("${jwt.secret}")
+    private String jwtSecret;
+
+    @Value("${jwt.expiry}")
+    private long tokenExpiry;
 
     private SecretKey getKey() {
-        return Keys.hmacShaKeyFor(SECRET.getBytes(StandardCharsets.UTF_8));
+        return Keys.hmacShaKeyFor(jwtSecret.getBytes(StandardCharsets.UTF_8));
     }
 
     public String generateToken(String email) {
         return Jwts.builder()
                 .subject(email)
                 .issuedAt(new Date())
-                .expiration(new Date(System.currentTimeMillis() + EXPIRY))
+                .expiration(new Date(System.currentTimeMillis() + tokenExpiry))
                 .signWith(getKey())
                 .compact();
     }
@@ -34,8 +43,8 @@ public class JwtUtil {
 
     public boolean validateToken(String token) {
         try {
-            getClaims(token);
-            return true;
+            Claims claims = getClaims(token);
+            return claims.getExpiration().after(new Date());
         } catch (Exception e) {
             return false;
         }
