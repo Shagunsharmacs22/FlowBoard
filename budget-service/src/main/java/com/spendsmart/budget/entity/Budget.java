@@ -16,10 +16,10 @@ public class Budget {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int budgetId;
+    private Long budgetId;
 
-    private int userId;
-    private int categoryId;
+    private Long userId;
+    private Long categoryId;
     private String name;
     private double limitAmount;
     private String currency;

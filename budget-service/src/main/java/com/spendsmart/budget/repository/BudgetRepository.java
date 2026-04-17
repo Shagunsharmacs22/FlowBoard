@@ -8,21 +8,21 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public interface BudgetRepository extends JpaRepository<Budget, Integer> {
+public interface BudgetRepository extends JpaRepository<Budget, Long> {
 
-    List<Budget> findByUserId(int userId);
+    List<Budget> findByUserId(Long userId);
 
-    Optional<Budget> findByBudgetId(int budgetId);
+    Optional<Budget> findByBudgetId(Long budgetId);
 
-    Optional<Budget> findByUserIdAndCategoryId(int userId, int categoryId);
+    Optional<Budget> findByUserIdAndCategoryId(Long userId, Long categoryId);
 
     List<Budget> findByPeriod(Budget.Period period);
 
     List<Budget> findByIsActive(boolean isActive);
 
-    List<Budget> findByUserIdAndIsActive(int userId, boolean isActive);
+    List<Budget> findByUserIdAndIsActive(Long userId, boolean isActive);
 
-    long countByUserId(int userId);
+    long countByUserId(Long userId);
 
-    void deleteByBudgetId(int budgetId);
+    void deleteByBudgetId(Long budgetId);
 }

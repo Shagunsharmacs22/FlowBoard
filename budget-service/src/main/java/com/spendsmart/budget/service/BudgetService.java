@@ -10,23 +10,23 @@ public interface BudgetService {
 
     Budget createBudget(Budget budget);
 
-    Optional<Budget> getBudgetById(int budgetId);
+    Optional<Budget> getBudgetById(Long budgetId);
 
-    List<Budget> getBudgetsByUser(int userId);
+    List<Budget> getBudgetsByUser(Long userId);
 
-    List<Budget> getActiveBudgets(int userId);
+    List<Budget> getActiveBudgets(Long userId);
 
-    Budget updateBudget(int budgetId, Budget budget);
+    Budget updateBudget(Long budgetId, Budget budget);
 
-    void deleteBudget(int budgetId);
+    void deleteBudget(Long budgetId);
 
-    void updateSpentAmount(int budgetId, double amount);
+    void updateSpentAmount(Long budgetId, double amount);
 
-    BudgetProgress getBudgetProgress(int budgetId);
+    BudgetProgress getBudgetProgress(Long budgetId);
 
-    List<String> checkBudgetAlerts(int userId);
+    List<String> checkBudgetAlerts(Long userId);
 
-    void resetBudgetPeriod(int budgetId);
+    void resetBudgetPeriod(Long budgetId);
 
-    Optional<Budget> getBudgetsByCategory(int userId, int categoryId);
+    Optional<Budget> getBudgetsByCategory(Long userId, Long categoryId);
 }

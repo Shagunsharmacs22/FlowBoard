@@ -31,22 +31,22 @@ public class BudgetServiceImpl implements BudgetService {
     }
 
     @Override
-    public Optional<Budget> getBudgetById(int budgetId) {
+    public Optional<Budget> getBudgetById(Long budgetId) {
         return budgetRepo.findByBudgetId(budgetId);
     }
 
     @Override
-    public List<Budget> getBudgetsByUser(int userId) {
+    public List<Budget> getBudgetsByUser(Long userId) {
         return budgetRepo.findByUserId(userId);
     }
 
     @Override
-    public List<Budget> getActiveBudgets(int userId) {
+    public List<Budget> getActiveBudgets(Long userId) {
         return budgetRepo.findByUserIdAndIsActive(userId, true);
     }
 
     @Override
-    public Budget updateBudget(int budgetId, Budget updatedBudget) {
+    public Budget updateBudget(Long budgetId, Budget updatedBudget) {
         Budget existing = budgetRepo.findByBudgetId(budgetId)
                 .orElseThrow(() -> new RuntimeException("Budget not found with id: " + budgetId));
 
@@ -65,12 +65,12 @@ public class BudgetServiceImpl implements BudgetService {
 
     @Override
     @Transactional
-    public void deleteBudget(int budgetId) {
+    public void deleteBudget(Long budgetId) {
         budgetRepo.deleteByBudgetId(budgetId);
     }
 
     @Override
-    public void updateSpentAmount(int budgetId, double amount) {
+    public void updateSpentAmount(Long budgetId, double amount) {
         Budget budget = budgetRepo.findByBudgetId(budgetId)
                 .orElseThrow(() -> new RuntimeException("Budget not found with id: " + budgetId));
         budget.setSpentAmount(budget.getSpentAmount() + amount);
@@ -78,7 +78,7 @@ public class BudgetServiceImpl implements BudgetService {
     }
 
     @Override
-    public BudgetProgress getBudgetProgress(int budgetId) {
+    public BudgetProgress getBudgetProgress(Long budgetId) {
         Budget budget = budgetRepo.findByBudgetId(budgetId)
                 .orElseThrow(() -> new RuntimeException("Budget not found with id: " + budgetId));
 
@@ -102,7 +102,7 @@ public class BudgetServiceImpl implements BudgetService {
     }
 
     @Override
-    public List<String> checkBudgetAlerts(int userId) {
+    public List<String> checkBudgetAlerts(Long userId) {
         List<Budget> budgets = budgetRepo.findByUserIdAndIsActive(userId, true);
         List<String> alerts = new ArrayList<>();
 
@@ -117,7 +117,7 @@ public class BudgetServiceImpl implements BudgetService {
     }
 
     @Override
-    public void resetBudgetPeriod(int budgetId) {
+    public void resetBudgetPeriod(Long budgetId) {
         Budget budget = budgetRepo.findByBudgetId(budgetId)
                 .orElseThrow(() -> new RuntimeException("Budget not found with id: " + budgetId));
         budget.setSpentAmount(0.0);
@@ -135,7 +135,7 @@ public class BudgetServiceImpl implements BudgetService {
     }
 
     @Override
-    public Optional<Budget> getBudgetsByCategory(int userId, int categoryId) {
+    public Optional<Budget> getBudgetsByCategory(Long userId, Long categoryId) {
         return budgetRepo.findByUserIdAndCategoryId(userId, categoryId);
     }
 
