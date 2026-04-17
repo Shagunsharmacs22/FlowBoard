@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.*;
 
 @RestController
-@RequestMapping("/analytics")
+@RequestMapping("/api/analytics")
 @RequiredArgsConstructor
 public class AnalyticsResource {
 
@@ -26,26 +26,26 @@ public class AnalyticsResource {
     }
 
     // ================== READ ==================
-    @GetMapping("/monthly")
-    public Map<String, Object> monthly(@RequestParam Long userId,
+    @GetMapping("/monthly/{userId}")
+    public Map<String, Object> monthly(@PathVariable Long userId,
                                        @RequestParam int year,
                                        @RequestParam int month) {
         return service.getMonthlySummary(userId, year, month);
     }
 
-    @GetMapping("/yearly")
-    public Map<String, Object> yearly(@RequestParam Long userId,
+    @GetMapping("/yearly/{userId}")
+    public Map<String, Object> yearly(@PathVariable Long userId,
                                       @RequestParam int year) {
         return service.getYearlySummary(userId, year);
     }
 
-    @GetMapping("/categories")
-    public Map<String, Double> categories(@RequestParam Long userId) {
+    @GetMapping("/categories/{userId}")
+    public Map<String, Double> categories(@PathVariable Long userId) {
         return service.getExpenseBreakdownByCategory(userId);
     }
 
-    @GetMapping("/health")
-    public int health(@RequestParam Long userId) {
+    @GetMapping("/health/{userId}")
+    public int health(@PathVariable Long userId) {
         return service.getFinancialHealthScore(userId);
     }
 
