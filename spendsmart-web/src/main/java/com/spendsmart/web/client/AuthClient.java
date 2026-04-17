@@ -7,7 +7,7 @@ import org.springframework.web.client.RestTemplate;
 public class AuthClient {
 
     private final RestTemplate restTemplate = new RestTemplate();
-    private final String BASE_URL = "http://localhost:8080/api/auth";
+    private final String BASE_URL = "http://localhost:8081/api/auth";
 
     // Register user
     public Object register(Object user) {

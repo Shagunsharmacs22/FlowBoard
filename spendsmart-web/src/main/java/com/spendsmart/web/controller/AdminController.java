@@ -53,11 +53,7 @@ public class AdminController {
         return "admin/top-users";
     }
 
-    @PostMapping("/notify")
-    public String sendPlatformNotification(@RequestParam String message) {
-        notificationClient.sendNotification(message);
-        return "redirect:/admin/dashboard";
-    }
+  
 
     @GetMapping("/reports")
     public String generateReport(Model model) {
