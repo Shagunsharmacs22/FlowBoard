@@ -15,12 +15,12 @@ public class Expense {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int expenseId;
+    private Long expenseId;
 
     @Column(nullable = false)
-    private int userId;
+    private Long userId;
 
-    private int categoryId;
+    private Long categoryId;
 
     @Column(nullable = false)
     private String title;

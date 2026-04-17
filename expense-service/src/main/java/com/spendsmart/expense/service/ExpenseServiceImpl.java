@@ -22,32 +22,32 @@ public class ExpenseServiceImpl implements ExpenseService {
     }
 
     @Override
-    public Optional<Expense> getExpenseById(int expenseId) {
+    public Optional<Expense> getExpenseById(Long expenseId) {
         return expenseRepository.findByExpenseId(expenseId);
     }
 
     @Override
-    public List<Expense> getExpensesByUser(int userId) {
+    public List<Expense> getExpensesByUser(Long userId) {
         return expenseRepository.findByUserId(userId);
     }
 
     @Override
-    public List<Expense> getExpensesByCategory(int userId, int categoryId) {
+    public List<Expense> getExpensesByCategory(Long userId, Long categoryId) {
         return expenseRepository.findByUserIdAndCategoryId(userId, categoryId);
     }
 
     @Override
-    public List<Expense> getExpensesByDateRange(int userId, LocalDate start, LocalDate end) {
+    public List<Expense> getExpensesByDateRange(Long userId, LocalDate start, LocalDate end) {
         return expenseRepository.findByUserIdAndDateBetween(userId, start, end);
     }
 
     @Override
-    public List<Expense> getExpensesByMonth(int userId, int month, int year) {
+    public List<Expense> getExpensesByMonth(Long userId, int month, int year) {
         return expenseRepository.findByUserIdAndMonthAndYear(userId, month, year);
     }
 
     @Override
-    public Expense updateExpense(int expenseId, Expense updatedExpense) {
+    public Expense updateExpense(Long expenseId, Expense updatedExpense) {
         Expense existing = expenseRepository.findByExpenseId(expenseId)
                 .orElseThrow(() -> new RuntimeException("Expense not found with id: " + expenseId));
 
@@ -67,29 +67,29 @@ public class ExpenseServiceImpl implements ExpenseService {
 
     @Override
     @Transactional
-    public void deleteExpense(int expenseId) {
+    public void deleteExpense(Long expenseId) {
         expenseRepository.findByExpenseId(expenseId)
                 .orElseThrow(() -> new RuntimeException("Expense not found with id: " + expenseId));
         expenseRepository.deleteByExpenseId(expenseId);
     }
 
     @Override
-    public Double getTotalByUser(int userId) {
+    public Double getTotalByUser(Long userId) {
         return expenseRepository.sumAmountByUserId(userId);
     }
 
     @Override
-    public Double getTotalByCategory(int userId, int categoryId) {
+    public Double getTotalByCategory(Long userId, Long categoryId) {
         return expenseRepository.sumAmountByUserIdAndCategoryId(userId, categoryId);
     }
 
     @Override
-    public List<Expense> getExpensesByType(int userId, String type) {
+    public List<Expense> getExpensesByType(Long userId, String type) {
         return expenseRepository.findByUserIdAndType(userId, type);
     }
 
     @Override
-    public List<Expense> searchExpenses(int userId, String keyword) {
+    public List<Expense> searchExpenses(Long userId, String keyword) {
         return expenseRepository.searchByKeyword(userId, keyword);
     }
 }

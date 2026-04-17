@@ -10,25 +10,25 @@ public interface ExpenseService {
 
     Expense addExpense(Expense expense);
 
-    Optional<Expense> getExpenseById(int expenseId);
+    Optional<Expense> getExpenseById(Long expenseId);
 
-    List<Expense> getExpensesByUser(int userId);
+    List<Expense> getExpensesByUser(Long userId);
 
-    List<Expense> getExpensesByCategory(int userId, int categoryId);
+    List<Expense> getExpensesByCategory(Long userId, Long categoryId);
 
-    List<Expense> getExpensesByDateRange(int userId, LocalDate start, LocalDate end);
+    List<Expense> getExpensesByDateRange(Long userId, LocalDate start, LocalDate end);
 
-    List<Expense> getExpensesByMonth(int userId, int month, int year);
+    List<Expense> getExpensesByMonth(Long userId, int month, int year);
 
-    Expense updateExpense(int expenseId, Expense updatedExpense);
+    Expense updateExpense(Long expenseId, Expense updatedExpense);
 
-    void deleteExpense(int expenseId);
+    void deleteExpense(Long expenseId);
 
-    Double getTotalByUser(int userId);
+    Double getTotalByUser(Long userId);
 
-    Double getTotalByCategory(int userId, int categoryId);
+    Double getTotalByCategory(Long userId, Long categoryId);
 
-    List<Expense> getExpensesByType(int userId, String type);
+    List<Expense> getExpensesByType(Long userId, String type);
 
     List<Expense> searchExpenses(int userId, String keyword);
 }
