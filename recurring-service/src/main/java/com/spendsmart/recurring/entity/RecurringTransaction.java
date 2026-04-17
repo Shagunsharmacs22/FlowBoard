@@ -14,10 +14,10 @@ public class RecurringTransaction {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer recurringId;
+    private Long recurringId;
 
-    private Integer userId;
-    private Integer categoryId;
+    private Long userId;
+    private Long categoryId;
 
     private String title;
     private double amount;

@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/recurring")
+@RequestMapping("/api/recurring")
 @RequiredArgsConstructor
 public class RecurringResource {
 
@@ -23,27 +23,27 @@ public class RecurringResource {
     }
 
     @GetMapping("/user/{id}")
-    public ResponseEntity<List<RecurringTransaction>> getByUser(@PathVariable int id) {
+    public ResponseEntity<List<RecurringTransaction>> getByUser(@PathVariable Long id) {
         return ResponseEntity.ok(service.getByUser(id));
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<?> getById(@PathVariable int id) {
-        return ResponseEntity.ok(service.getById(id));
+    public ResponseEntity<RecurringTransaction> getById(@PathVariable Long id) {
+        return ResponseEntity.ok(service.getById(id).orElseThrow(() -> new RuntimeException("Not found")));
     }
 
     @GetMapping("/active/{userId}")
-    public ResponseEntity<?> active(@PathVariable int userId) {
+    public ResponseEntity<List<RecurringTransaction>> active(@PathVariable Long userId) {
         return ResponseEntity.ok(service.getActiveRecurring(userId));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<?> update(@PathVariable int id, @RequestBody RecurringTransaction rt) {
+    public ResponseEntity<RecurringTransaction> update(@PathVariable Long id, @RequestBody RecurringTransaction rt) {
         return ResponseEntity.ok(service.updateRecurring(id, rt));
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> delete(@PathVariable int id) {
+    public ResponseEntity<?> delete(@PathVariable Long id) {
         service.deleteRecurring(id);
         return ResponseEntity.ok("Deleted");
     }

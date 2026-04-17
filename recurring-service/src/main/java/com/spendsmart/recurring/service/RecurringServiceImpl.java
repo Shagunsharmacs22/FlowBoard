@@ -27,35 +27,35 @@ public class RecurringServiceImpl implements RecurringService {
     }
 
     @Override
-    public List<RecurringTransaction> getByUser(int userId) {
+    public List<RecurringTransaction> getByUser(Long userId) {
         return repo.findByUserId(userId);
     }
 
     @Override
-    public Optional<RecurringTransaction> getById(int id) {
+    public Optional<RecurringTransaction> getById(Long id) {
         return repo.findById(id);
     }
 
     @Override
-    public List<RecurringTransaction> getActiveRecurring(int userId) {
+    public List<RecurringTransaction> getActiveRecurring(Long userId) {
         return repo.findByUserIdAndIsActive(userId, true);
     }
 
     @Override
-    public RecurringTransaction updateRecurring(int id, RecurringTransaction rt) {
+    public RecurringTransaction updateRecurring(Long id, RecurringTransaction rt) {
         rt.setRecurringId(id);
         return repo.save(rt);
     }
 
     @Override
-    public void deactivateRecurring(int id) {
+    public void deactivateRecurring(Long id) {
         RecurringTransaction rt = repo.findById(id).orElseThrow();
         rt.setActive(false);
         repo.save(rt);
     }
 
     @Override
-    public void deleteRecurring(int id) {
+    public void deleteRecurring(Long id) {
         repo.deleteById(id);
     }
 
@@ -76,7 +76,7 @@ public class RecurringServiceImpl implements RecurringService {
     }
 
     @Override
-    public void updateNextDueDate(int id) {
+    public void updateNextDueDate(Long id) {
         RecurringTransaction rt = repo.findById(id).orElseThrow();
 
         LocalDate next = rt.getNextDueDate();
@@ -99,7 +99,7 @@ public class RecurringServiceImpl implements RecurringService {
     }
 
     @Override
-    public List<RecurringTransaction> getUpcomingThisMonth(int userId) {
+    public List<RecurringTransaction> getUpcomingThisMonth(Long userId) {
         LocalDate now = LocalDate.now();
         LocalDate end = now.withDayOfMonth(now.lengthOfMonth());
 

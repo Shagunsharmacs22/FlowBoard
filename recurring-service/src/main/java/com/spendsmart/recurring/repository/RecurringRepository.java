@@ -8,19 +8,19 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
-public interface RecurringRepository extends JpaRepository<RecurringTransaction, Integer> {
+public interface RecurringRepository extends JpaRepository<RecurringTransaction, Long> {
 
-    List<RecurringTransaction> findByUserId(int userId);
+    List<RecurringTransaction> findByUserId(Long userId);
 
-    List<RecurringTransaction> findByUserIdAndType(int userId, String type);
+    List<RecurringTransaction> findByUserIdAndType(Long userId, String type);
 
-    List<RecurringTransaction> findByUserIdAndIsActive(int userId, boolean isActive);
+    List<RecurringTransaction> findByUserIdAndIsActive(Long userId, boolean isActive);
 
     List<RecurringTransaction> findByNextDueDateBefore(LocalDate date);
 
-    Optional<RecurringTransaction> findByRecurringId(int id);
+    Optional<RecurringTransaction> findByRecurringId(Long id);
 
     List<RecurringTransaction> findByFrequency(String frequency);
 
-    int countByUserIdAndIsActive(int userId, boolean isActive);
+    int countByUserIdAndIsActive(Long userId, boolean isActive);
 }

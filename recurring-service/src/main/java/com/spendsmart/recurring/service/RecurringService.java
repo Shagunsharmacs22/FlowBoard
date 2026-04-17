@@ -10,23 +10,23 @@ public interface RecurringService {
 
     RecurringTransaction addRecurring(RecurringTransaction rt);
 
-    List<RecurringTransaction> getByUser(int userId);
+    List<RecurringTransaction> getByUser(Long userId);
 
-    Optional<RecurringTransaction> getById(int id);
+    Optional<RecurringTransaction> getById(Long id);
 
-    List<RecurringTransaction> getActiveRecurring(int userId);
+    List<RecurringTransaction> getActiveRecurring(Long userId);
 
-    RecurringTransaction updateRecurring(int id, RecurringTransaction rt);
+    RecurringTransaction updateRecurring(Long id, RecurringTransaction rt);
 
-    void deactivateRecurring(int id);
+    void deactivateRecurring(Long id);
 
-    void deleteRecurring(int id);
+    void deleteRecurring(Long id);
 
     List<RecurringTransaction> processUpcomingDue();
 
-    void updateNextDueDate(int id);
+    void updateNextDueDate(Long id);
 
     void generateTransactionFromRecurring(RecurringTransaction rt);
 
-    List<RecurringTransaction> getUpcomingThisMonth(int userId);
+    List<RecurringTransaction> getUpcomingThisMonth(Long userId);
 }
