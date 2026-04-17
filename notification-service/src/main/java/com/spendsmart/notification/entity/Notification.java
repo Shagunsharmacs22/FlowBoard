@@ -14,9 +14,9 @@ public class Notification {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int notificationId;
+    private Long notificationId;
 
-    private int recipientId;
+    private Long recipientId;
 
     private String type; // BUDGET_ALERT, SYSTEM, etc
     private String severity; // INFO, WARNING, CRITICAL

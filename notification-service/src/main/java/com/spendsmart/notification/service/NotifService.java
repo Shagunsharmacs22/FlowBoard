@@ -7,21 +7,21 @@ public interface NotifService {
 
     void send(Notification notification);
 
-    void sendBudgetAlert(int recipientId, String message, double amount);
+    void sendBudgetAlert(Long recipientId, String message, double amount);
 
-    void sendBulk(List<Integer> recipients, String title, String message);
+    void sendBulk(List<Long> recipients, String title, String message);
 
-    void markAsRead(int notificationId);
+    void markAsRead(Long notificationId);
 
-    void markAllRead(int recipientId);
+    void markAllRead(Long recipientId);
 
-    void acknowledge(int notificationId);
+    void acknowledge(Long notificationId);
 
-    List<Notification> getByRecipient(int recipientId);
+    List<Notification> getByRecipient(Long recipientId);
 
-    int getUnreadCount(int recipientId);
+    int getUnreadCount(Long recipientId);
 
-    void deleteNotification(int notificationId);
+    void deleteNotification(Long notificationId);
 
     List<Notification> getAll();
 }

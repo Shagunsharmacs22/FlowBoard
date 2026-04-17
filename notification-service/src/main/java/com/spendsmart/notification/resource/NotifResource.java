@@ -10,42 +10,42 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/notifications")
+@RequestMapping("/api/notifications")
 @RequiredArgsConstructor
 public class NotifResource {
 
     private final NotifService service;
 
     @GetMapping("/{recipientId}")
-    public List<Notification> getByRecipient(@PathVariable int recipientId) {
+    public List<Notification> getByRecipient(@PathVariable Long recipientId) {
         return service.getByRecipient(recipientId);
     }
 
     @PutMapping("/read/{id}")
-    public ResponseEntity<?> markAsRead(@PathVariable int id) {
+    public ResponseEntity<?> markAsRead(@PathVariable Long id) {
         service.markAsRead(id);
         return ResponseEntity.ok("Marked as read");
     }
 
     @PutMapping("/read/all/{recipientId}")
-    public ResponseEntity<?> markAllRead(@PathVariable int recipientId) {
+    public ResponseEntity<?> markAllRead(@PathVariable Long recipientId) {
         service.markAllRead(recipientId);
         return ResponseEntity.ok("All marked as read");
     }
 
     @PutMapping("/ack/{id}")
-    public ResponseEntity<?> acknowledge(@PathVariable int id) {
+    public ResponseEntity<?> acknowledge(@PathVariable Long id) {
         service.acknowledge(id);
         return ResponseEntity.ok("Acknowledged");
     }
 
     @GetMapping("/unread-count/{recipientId}")
-    public int getUnreadCount(@PathVariable int recipientId) {
+    public int getUnreadCount(@PathVariable Long recipientId) {
         return service.getUnreadCount(recipientId);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> delete(@PathVariable int id) {
+    public ResponseEntity<?> delete(@PathVariable Long id) {
         service.deleteNotification(id);
         return ResponseEntity.ok("Deleted");
     }

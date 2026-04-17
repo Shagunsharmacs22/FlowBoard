@@ -5,13 +5,13 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
 
-public interface NotificationRepository extends JpaRepository<Notification, Integer> {
+public interface NotificationRepository extends JpaRepository<Notification, Long> {
 
-    List<Notification> findByRecipientId(int recipientId);
+    List<Notification> findByRecipientId(Long recipientId);
 
-    List<Notification> findByRecipientIdAndIsRead(int recipientId, boolean isRead);
+    List<Notification> findByRecipientIdAndIsRead(Long recipientId, boolean isRead);
 
-    int countByRecipientIdAndIsRead(int recipientId, boolean isRead);
+    int countByRecipientIdAndIsRead(Long recipientId, boolean isRead);
 
     List<Notification> findByType(String type);
 
