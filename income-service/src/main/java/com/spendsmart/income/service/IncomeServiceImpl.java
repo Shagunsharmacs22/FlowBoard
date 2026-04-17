@@ -20,33 +20,33 @@ public class IncomeServiceImpl implements IncomeService {
     }
 
     @Override
-    public Income getIncomeById(int id) {
+    public Income getIncomeById(Long id) {
         return repo.findById(id)
                 .orElseThrow(() -> new RuntimeException("Income not found with id: " + id));
     }
 
     @Override
-    public List<Income> getIncomesByUser(int userId) {
+    public List<Income> getIncomesByUser(Long userId) {
         return repo.findByUserId(userId);
     }
 
     @Override
-    public List<Income> getIncomesBySource(int userId, String source) {
+    public List<Income> getIncomesBySource(Long userId, String source) {
         return repo.findByUserIdAndSource(userId, source);
     }
 
     @Override
-    public List<Income> getIncomesByDateRange(int userId, LocalDate start, LocalDate end) {
+    public List<Income> getIncomesByDateRange(Long userId, LocalDate start, LocalDate end) {
         return repo.findByUserIdAndDateBetween(userId, start, end);
     }
 
     @Override
-    public List<Income> getIncomesByMonth(int userId, int month, int year) {
+    public List<Income> getIncomesByMonth(Long userId, int month, int year) {
         return repo.findByUserIdAndMonth(userId, month, year);
     }
 
     @Override
-    public Income updateIncome(int id, Income income) {
+    public Income updateIncome(Long id, Income income) {
         Income existing = repo.findById(id)
                 .orElseThrow(() -> new RuntimeException("Income not found with id: " + id));
 
@@ -64,21 +64,21 @@ public class IncomeServiceImpl implements IncomeService {
     }
 
     @Override
-    public void deleteIncome(int id) {
+    public void deleteIncome(Long id) {
         Income existing = repo.findById(id)
                 .orElseThrow(() -> new RuntimeException("Income not found with id: " + id));
         repo.delete(existing);
     }
 
     @Override
-    public Double getTotalIncomeByUser(int userId) {
+    public Double getTotalIncomeByUser(Long userId) {
         Double total = repo.sumAmountByUserId(userId);
         return total != null ? total : 0.0;
     }
 
     // ✅ NEW - added for Analytics-Service support
     @Override
-    public Double getTotalIncomeByMonth(int userId, int month, int year) {
+    public Double getTotalIncomeByMonth(Long userId, int month, int year) {
         Double total = repo.sumAmountByUserIdAndMonth(userId, month, year);
         return total != null ? total : 0.0;
     }

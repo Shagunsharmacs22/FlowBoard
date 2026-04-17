@@ -9,32 +9,32 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
-public interface IncomeRepository extends JpaRepository<Income, Integer> {
+public interface IncomeRepository extends JpaRepository<Income, Long> {
 
-    List<Income> findByUserId(int userId);
+    List<Income> findByUserId(Long userId);
 
-    List<Income> findByUserIdAndSource(int userId, String source);
+    List<Income> findByUserIdAndSource(Long userId, String source);
 
-    List<Income> findByUserIdAndDateBetween(int userId, LocalDate start, LocalDate end);
+    List<Income> findByUserIdAndDateBetween(Long userId, LocalDate start, LocalDate end);
 
     @Query("SELECT i FROM Income i WHERE i.userId = :userId AND MONTH(i.date) = :month AND YEAR(i.date) = :year")
-    List<Income> findByUserIdAndMonth(@Param("userId") int userId,
+    List<Income> findByUserIdAndMonth(@Param("userId") Long userId,
                                      @Param("month") int month,
                                      @Param("year") int year);
 
     @Query("SELECT SUM(i.amount) FROM Income i WHERE i.userId = :userId")
-    Double sumAmountByUserId(@Param("userId") int userId);
+    Double sumAmountByUserId(@Param("userId") Long userId);
 
     @Query("SELECT SUM(i.amount) FROM Income i WHERE i.userId = :userId AND MONTH(i.date) = :month AND YEAR(i.date) = :year")
-    Double sumAmountByUserIdAndMonth(@Param("userId") int userId,
+    Double sumAmountByUserIdAndMonth(@Param("userId") Long userId,
                                     @Param("month") int month,
                                     @Param("year") int year);
 
     List<Income> findByIsRecurring(boolean isRecurring);
 
     // findByIncomeId - same as findById but explicit
-    Optional<Income> findByIncomeId(int incomeId);
+    Optional<Income> findByIncomeId(Long incomeId);
 
     // deleteByIncomeId
-    void deleteByIncomeId(int incomeId);
+    void deleteByIncomeId(Long incomeId);
 }

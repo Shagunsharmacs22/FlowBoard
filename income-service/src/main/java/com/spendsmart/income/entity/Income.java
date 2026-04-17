@@ -10,10 +10,10 @@ public class Income {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int incomeId;
+    private Long incomeId;
 
-    private int userId;
-    private int categoryId;
+    private Long userId;
+    private Long categoryId;
 
     private String title;
     private double amount;
@@ -30,15 +30,15 @@ public class Income {
 
     // ================= GETTERS =================
 
-    public int getIncomeId() {
+    public Long getIncomeId() {
         return incomeId;
     }
 
-    public int getUserId() {
+    public Long getUserId() {
         return userId;
     }
 
-    public int getCategoryId() {
+    public Long getCategoryId() {
         return categoryId;
     }
 
@@ -80,15 +80,15 @@ public class Income {
 
     // ================= SETTERS =================
 
-    public void setIncomeId(int incomeId) {
+    public void setIncomeId(Long incomeId) {
         this.incomeId = incomeId;
     }
 
-    public void setUserId(int userId) {
+    public void setUserId(Long userId) {
         this.userId = userId;
     }
 
-    public void setCategoryId(int categoryId) {
+    public void setCategoryId(Long categoryId) {
         this.categoryId = categoryId;
     }
 

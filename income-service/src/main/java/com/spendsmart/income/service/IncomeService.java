@@ -9,24 +9,24 @@ public interface IncomeService {
 
     Income addIncome(Income income);
 
-    Income getIncomeById(int id);
+    Income getIncomeById(Long id);
 
-    List<Income> getIncomesByUser(int userId);
+    List<Income> getIncomesByUser(Long userId);
 
-    List<Income> getIncomesBySource(int userId, String source);
+    List<Income> getIncomesBySource(Long userId, String source);
 
-    List<Income> getIncomesByDateRange(int userId, LocalDate start, LocalDate end);
+    List<Income> getIncomesByDateRange(Long userId, LocalDate start, LocalDate end);
 
-    List<Income> getIncomesByMonth(int userId, int month, int year);
+    List<Income> getIncomesByMonth(Long userId, int month, int year);
 
-    Income updateIncome(int id, Income income);
+    Income updateIncome(Long id, Income income);
 
-    void deleteIncome(int id);
+    void deleteIncome(Long id);
 
-    Double getTotalIncomeByUser(int userId);
+    Double getTotalIncomeByUser(Long userId);
 
     // ✅ NEW - missing from earlier version
-    Double getTotalIncomeByMonth(int userId, int month, int year);
+    Double getTotalIncomeByMonth(Long userId, int month, int year);
 
     List<Income> getRecurringIncomes();
 }

@@ -10,7 +10,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 @RestController
-@RequestMapping("/incomes")
+@RequestMapping("/api/incomes")
 public class IncomeResource {
 
     @Autowired
@@ -24,20 +24,20 @@ public class IncomeResource {
 
     // ✅ GET by ID
     @GetMapping("/{id}")
-    public ResponseEntity<Income> getById(@PathVariable int id) {
+    public ResponseEntity<Income> getById(@PathVariable Long id) {
         return ResponseEntity.ok(service.getIncomeById(id));
     }
 
     // ✅ GET by User
     @GetMapping("/user/{userId}")
-    public ResponseEntity<List<Income>> getByUser(@PathVariable int userId) {
+    public ResponseEntity<List<Income>> getByUser(@PathVariable Long userId) {
         return ResponseEntity.ok(service.getIncomesByUser(userId));
     }
 
     // ✅ GET by Source
     @GetMapping("/source")
     public ResponseEntity<List<Income>> getBySource(
-            @RequestParam int userId,
+            @RequestParam Long userId,
             @RequestParam String source) {
         return ResponseEntity.ok(service.getIncomesBySource(userId, source));
     }
@@ -45,7 +45,7 @@ public class IncomeResource {
     // ✅ GET by Date Range
     @GetMapping("/range")
     public ResponseEntity<List<Income>> getByDateRange(
-            @RequestParam int userId,
+            @RequestParam Long userId,
             @RequestParam String start,
             @RequestParam String end) {
         return ResponseEntity.ok(service.getIncomesByDateRange(
@@ -57,7 +57,7 @@ public class IncomeResource {
     // ✅ GET by Month (NEW - was missing)
     @GetMapping("/month")
     public ResponseEntity<List<Income>> getByMonth(
-            @RequestParam int userId,
+            @RequestParam Long userId,
             @RequestParam int month,
             @RequestParam int year) {
         return ResponseEntity.ok(service.getIncomesByMonth(userId, month, year));
@@ -70,15 +70,15 @@ public class IncomeResource {
     }
 
     // ✅ GET Total by User
-    @GetMapping("/total/user/{userId}")
-    public ResponseEntity<Double> getTotalByUser(@PathVariable int userId) {
+    @GetMapping("/user/{userId}/total")
+    public ResponseEntity<Double> getTotalByUser(@PathVariable Long userId) {
         return ResponseEntity.ok(service.getTotalIncomeByUser(userId));
     }
 
     // ✅ GET Total by Month (NEW - was missing)
     @GetMapping("/total/month")
     public ResponseEntity<Double> getTotalByMonth(
-            @RequestParam int userId,
+            @RequestParam Long userId,
             @RequestParam int month,
             @RequestParam int year) {
         return ResponseEntity.ok(service.getTotalIncomeByMonth(userId, month, year));
@@ -86,13 +86,13 @@ public class IncomeResource {
 
     // ✅ PUT - Update Income
     @PutMapping("/{id}")
-    public ResponseEntity<Income> update(@PathVariable int id, @RequestBody Income income) {
+    public ResponseEntity<Income> update(@PathVariable Long id, @RequestBody Income income) {
         return ResponseEntity.ok(service.updateIncome(id, income));
     }
 
     // ✅ DELETE
     @DeleteMapping("/{id}")
-    public ResponseEntity<String> delete(@PathVariable int id) {
+    public ResponseEntity<String> delete(@PathVariable Long id) {
         service.deleteIncome(id);
         return ResponseEntity.ok("Income deleted successfully with id: " + id);
     }
