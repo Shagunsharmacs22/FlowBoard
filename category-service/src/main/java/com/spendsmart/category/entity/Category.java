@@ -10,10 +10,10 @@ public class Category {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int categoryId;
+    private Long categoryId;
 
     @Column(nullable = false)
-    private int userId;
+    private Long userId;
 
     @Column(nullable = false)
     private String name;
@@ -37,7 +37,7 @@ public class Category {
         this.createdAt = LocalDate.now();
     }
 
-    public Category(int userId, String name, String type, String icon,
+    public Category(Long userId, String name, String type, String icon,
                     String colorCode, double budgetLimit, boolean isDefault) {
         this.userId      = userId;
         this.name        = name;
@@ -51,11 +51,11 @@ public class Category {
 
     // ─── Getters & Setters ──────────────────────────────────────────────────
 
-    public int getCategoryId()               { return categoryId; }
-    public void setCategoryId(int categoryId){ this.categoryId = categoryId; }
+    public Long getCategoryId()                   { return categoryId; }
+    public void setCategoryId(Long categoryId)    { this.categoryId = categoryId; }
 
-    public int getUserId()                   { return userId; }
-    public void setUserId(int userId)        { this.userId = userId; }
+    public Long getUserId()                       { return userId; }
+    public void setUserId(Long userId)            { this.userId = userId; }
 
     public String getName()                  { return name; }
     public void setName(String name)         { this.name = name; }

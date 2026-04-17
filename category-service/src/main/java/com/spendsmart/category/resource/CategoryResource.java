@@ -13,7 +13,7 @@ import java.util.List;
  * REST controller exposing category management endpoints under /categories.
  */
 @RestController
-@RequestMapping("/categories")
+@RequestMapping("/api/categories")
 public class CategoryResource {
 
     // field-level injection kept intentionally private (matches class diagram)
@@ -41,7 +41,7 @@ public class CategoryResource {
      * Get all categories for a user.
      */
     @GetMapping("/user/{userId}")
-    public ResponseEntity<List<Category>> getByUser(@PathVariable int userId) {
+    public ResponseEntity<List<Category>> getByUser(@PathVariable Long userId) {
         List<Category> categories = categoryService.getByUserId(userId);
         return ResponseEntity.ok(categories);
     }
@@ -51,7 +51,7 @@ public class CategoryResource {
      * Get a single category by its ID.
      */
     @GetMapping("/{categoryId}")
-    public ResponseEntity<Category> getById(@PathVariable int categoryId) {
+    public ResponseEntity<Category> getById(@PathVariable Long categoryId) {
         return categoryService.getCategoryById(categoryId)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
@@ -63,7 +63,7 @@ public class CategoryResource {
      */
     @GetMapping("/user/{userId}/type/{type}")
     public ResponseEntity<List<Category>> getByType(
-            @PathVariable int userId,
+            @PathVariable Long userId,
             @PathVariable String type) {
         List<Category> categories = categoryService.getByUserAndType(userId, type);
         return ResponseEntity.ok(categories);
@@ -75,7 +75,7 @@ public class CategoryResource {
      */
     @PutMapping("/{categoryId}")
     public ResponseEntity<Category> update(
-            @PathVariable int categoryId,
+            @PathVariable Long categoryId,
             @RequestBody Category category) {
         Category updated = categoryService.updateCategory(categoryId, category);
         return ResponseEntity.ok(updated);
@@ -86,7 +86,7 @@ public class CategoryResource {
      * Delete a category.
      */
     @DeleteMapping("/{categoryId}")
-    public ResponseEntity<Void> delete(@PathVariable int categoryId) {
+    public ResponseEntity<Void> delete(@PathVariable Long categoryId) {
         categoryService.deleteCategory(categoryId);
         return ResponseEntity.noContent().build();
     }
@@ -108,7 +108,7 @@ public class CategoryResource {
      */
     @PutMapping("/{categoryId}/budget")
     public ResponseEntity<Void> setBudget(
-            @PathVariable int categoryId,
+            @PathVariable Long categoryId,
             @RequestParam double amount) {
         categoryService.setCategoryBudget(categoryId, amount);
         return ResponseEntity.ok().build();
@@ -119,7 +119,7 @@ public class CategoryResource {
      * Get total category count for a user.
      */
     @GetMapping("/user/{userId}/count")
-    public ResponseEntity<Integer> getCount(@PathVariable int userId) {
+    public ResponseEntity<Integer> getCount(@PathVariable Long userId) {
         int count = categoryService.getCategoryCount(userId);
         return ResponseEntity.ok(count);
     }

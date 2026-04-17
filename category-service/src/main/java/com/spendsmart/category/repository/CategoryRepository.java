@@ -8,27 +8,27 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public interface CategoryRepository extends JpaRepository<Category, Integer> {
+public interface CategoryRepository extends JpaRepository<Category, Long> {
 
     /**
      * Find all categories belonging to a user.
      */
-    List<Category> findByUserId(int userId);
+    List<Category> findByUserId(Long userId);
 
     /**
      * Find categories for a user filtered by type (EXPENSE or INCOME).
      */
-    List<Category> findByUserIdAndType(int userId, String type);
+    List<Category> findByUserIdAndType(Long userId, String type);
 
     /**
      * Find a single category by its ID.
      */
-    Optional<Category> findByCategoryId(int categoryId);
+    Optional<Category> findByCategoryId(Long categoryId);
 
     /**
      * Find a category by user ID and name (for duplicate-name validation).
      */
-    Optional<Category> findByUserIdAndName(int userId, String name);
+    Optional<Category> findByUserIdAndName(Long userId, String name);
 
     /**
      * Find all system-seeded default categories.

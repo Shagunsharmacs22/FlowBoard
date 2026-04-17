@@ -55,23 +55,23 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
-    public List<Category> getByUserId(int userId) {
+    public List<Category> getByUserId(Long userId) {
         return catRepo.findByUserId(userId);
     }
 
     @Override
-    public Optional<Category> getCategoryById(int categoryId) {
+    public Optional<Category> getCategoryById(Long categoryId) {
         return catRepo.findByCategoryId(categoryId);
     }
 
     @Override
-    public List<Category> getByUserAndType(int userId, String type) {
+    public List<Category> getByUserAndType(Long userId, String type) {
         return catRepo.findByUserIdAndType(userId, type);
     }
 
     @Override
     @Transactional
-    public Category updateCategory(int categoryId, Category updated) {
+    public Category updateCategory(Long categoryId, Category updated) {
         Category existing = catRepo.findByCategoryId(categoryId)
                 .orElseThrow(() -> new RuntimeException(
                         "Category not found with id: " + categoryId));
@@ -87,7 +87,7 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     @Transactional
-    public void deleteCategory(int categoryId) {
+    public void deleteCategory(Long categoryId) {
         catRepo.deleteByCategoryId(categoryId);
     }
 
@@ -98,7 +98,7 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     @Transactional
-    public void initDefaultCategories(int userId) {
+    public void initDefaultCategories(Long userId) {
         // Seed EXPENSE defaults
         for (Object[] seed : DEFAULT_EXPENSES) {
             Category c = new Category();
@@ -130,7 +130,7 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     @Transactional
-    public void setCategoryBudget(int categoryId, double budgetLimit) {
+    public void setCategoryBudget(Long categoryId, double budgetLimit) {
         Category category = catRepo.findByCategoryId(categoryId)
                 .orElseThrow(() -> new RuntimeException(
                         "Category not found with id: " + categoryId));
@@ -139,7 +139,7 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
-    public int getCategoryCount(int userId) {
+    public int getCategoryCount(Long userId) {
         return catRepo.countByUserId(userId);
     }
 }

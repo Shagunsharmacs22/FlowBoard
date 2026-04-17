@@ -21,7 +21,7 @@ public interface CategoryService {
      * @param userId the user's ID
      * @return list of categories owned by the user
      */
-    List<Category> getByUserId(int userId);
+    List<Category> getByUserId(Long userId);
 
     /**
      * Fetch a single category by its ID.
@@ -29,7 +29,7 @@ public interface CategoryService {
      * @param categoryId the category's ID
      * @return Optional containing the category, or empty if not found
      */
-    Optional<Category> getCategoryById(int categoryId);
+    Optional<Category> getCategoryById(Long categoryId);
 
     /**
      * Fetch categories for a user filtered by transaction type.
@@ -38,7 +38,7 @@ public interface CategoryService {
      * @param type   EXPENSE or INCOME
      * @return list of matching categories
      */
-    List<Category> getByUserAndType(int userId, String type);
+    List<Category> getByUserAndType(Long userId, String type);
 
     /**
      * Update an existing category.
@@ -47,14 +47,14 @@ public interface CategoryService {
      * @param category   object carrying new values
      * @return the updated Category
      */
-    Category updateCategory(int categoryId, Category category);
+    Category updateCategory(Long categoryId, Category category);
 
     /**
      * Delete a category by its ID.
      *
      * @param categoryId the category's ID
      */
-    void deleteCategory(int categoryId);
+    void deleteCategory(Long categoryId);
 
     /**
      * Get all system-seeded default categories.
@@ -69,7 +69,7 @@ public interface CategoryService {
      *
      * @param userId the new user's ID
      */
-    void initDefaultCategories(int userId);
+    void initDefaultCategories(Long userId);
 
     /**
      * Set (or update) a budget limit on a specific category.
@@ -77,7 +77,7 @@ public interface CategoryService {
      * @param categoryId  the category's ID
      * @param budgetLimit the new budget limit amount
      */
-    void setCategoryBudget(int categoryId, double budgetLimit);
+    void setCategoryBudget(Long categoryId, double budgetLimit);
 
     /**
      * Return the total number of categories for a user.
