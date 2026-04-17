@@ -28,7 +28,7 @@ import java.util.Map;
  *   GET    /auth/users            (admin helper)
  */
 @RestController
-@RequestMapping("/auth")
+@RequestMapping("/api/auth")
 public class AuthController {
 
     @Autowired
