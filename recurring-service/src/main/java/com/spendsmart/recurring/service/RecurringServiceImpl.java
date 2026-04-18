@@ -69,6 +69,13 @@ public class RecurringServiceImpl implements RecurringService {
         for (RecurringTransaction rt : list) {
             if (rt.isActive()) {
                 generateTransactionFromRecurring(rt);
+                notificationClient.sendReminder(
+                        rt.getUserId(),
+                        "Recurring Transaction Processed",
+                        "Processed recurring " + rt.getType().name().toLowerCase() + " '" + rt.getTitle()
+                                + "' for amount " + rt.getAmount() + ".",
+                        rt.getRecurringId()
+                );
                 updateNextDueDate(rt.getRecurringId());
             }
         }
