@@ -94,4 +94,13 @@ public class BudgetResource {
         budgetService.updateSpentAmount(id, amount);
         return ResponseEntity.ok().build();
     }
+
+    // POST /budgets/{id}/spent — Update spent amount for inter-service clients
+    @PostMapping("/{id}/spent")
+    public ResponseEntity<Void> updateSpentPost(
+            @PathVariable Long id,
+            @RequestParam double amount) {
+        budgetService.updateSpentAmount(id, amount);
+        return ResponseEntity.ok().build();
+    }
 }

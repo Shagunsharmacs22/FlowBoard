@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class BudgetProgress {
-    private int budgetId;
+    private Long budgetId;
     private double limitAmount;
     private double spentAmount;
     private double remainingAmount;

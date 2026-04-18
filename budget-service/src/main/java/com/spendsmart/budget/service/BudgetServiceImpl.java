@@ -1,6 +1,7 @@
 package com.spendsmart.budget.service;
 
 
+import com.spendsmart.budget.client.NotificationClient;
 import com.spendsmart.budget.dto.BudgetProgress;
 import com.spendsmart.budget.entity.Budget;
 import com.spendsmart.budget.repository.BudgetRepository;
@@ -19,9 +20,11 @@ import java.util.Optional;
 public class BudgetServiceImpl implements BudgetService {
 
     private final BudgetRepository budgetRepo;
+    private final NotificationClient notificationClient;
 
     @Override
     public Budget createBudget(Budget budget) {
+        validateCategorySelection(budget);
         budget.setSpentAmount(0.0);
         budget.setActive(true);
         if (budget.getStartDate() == null) {
@@ -47,6 +50,7 @@ public class BudgetServiceImpl implements BudgetService {
 
     @Override
     public Budget updateBudget(Long budgetId, Budget updatedBudget) {
+        validateCategorySelection(updatedBudget);
         Budget existing = budgetRepo.findByBudgetId(budgetId)
                 .orElseThrow(() -> new RuntimeException("Budget not found with id: " + budgetId));
 
@@ -73,7 +77,24 @@ public class BudgetServiceImpl implements BudgetService {
     public void updateSpentAmount(Long budgetId, double amount) {
         Budget budget = budgetRepo.findByBudgetId(budgetId)
                 .orElseThrow(() -> new RuntimeException("Budget not found with id: " + budgetId));
-        budget.setSpentAmount(budget.getSpentAmount() + amount);
+        double previousSpentAmount = budget.getSpentAmount();
+        double previousUsage = budget.getLimitAmount() > 0 ? (previousSpentAmount / budget.getLimitAmount()) * 100 : 0;
+        budget.setSpentAmount(previousSpentAmount + amount);
+        double currentUsage = budget.getLimitAmount() > 0 ? (budget.getSpentAmount() / budget.getLimitAmount()) * 100 : 0;
+
+        if (previousUsage < budget.getAlertThreshold() && currentUsage >= budget.getAlertThreshold()) {
+            String severity = currentUsage >= 100 ? "CRITICAL" : "WARNING";
+            String message = "Budget '" + budget.getName() + "' has reached "
+                    + String.format("%.1f", currentUsage) + "% of its limit.";
+            notificationClient.sendBudgetAlert(
+                    budget.getUserId(),
+                    "Budget Alert",
+                    message,
+                    severity,
+                    budget.getBudgetId()
+            );
+        }
+
         budgetRepo.save(budget);
     }
 
@@ -82,8 +103,10 @@ public class BudgetServiceImpl implements BudgetService {
         Budget budget = budgetRepo.findByBudgetId(budgetId)
                 .orElseThrow(() -> new RuntimeException("Budget not found with id: " + budgetId));
 
-        double percentageUsed = (budget.getSpentAmount() / budget.getLimitAmount()) * 100;
-        double remaining = budget.getLimitAmount() - budget.getSpentAmount();
+        double limitAmount = budget.getLimitAmount();
+        double spentAmount = budget.getSpentAmount();
+        double percentageUsed = limitAmount > 0 ? (spentAmount / limitAmount) * 100 : 0;
+        double remaining = limitAmount - spentAmount;
         boolean alertTriggered = percentageUsed >= budget.getAlertThreshold();
 
         String alertMessage = alertTriggered
@@ -92,8 +115,8 @@ public class BudgetServiceImpl implements BudgetService {
 
         return new BudgetProgress(
                 budget.getBudgetId(),
-                budget.getLimitAmount(),
-                budget.getSpentAmount(),
+                limitAmount,
+                spentAmount,
                 remaining,
                 percentageUsed,
                 alertTriggered,
@@ -137,6 +160,12 @@ public class BudgetServiceImpl implements BudgetService {
     @Override
     public Optional<Budget> getBudgetsByCategory(Long userId, Long categoryId) {
         return budgetRepo.findByUserIdAndCategoryId(userId, categoryId);
+    }
+
+    private void validateCategorySelection(Budget budget) {
+        if (budget.getCategoryId() == null || budget.getCategoryId() <= 0) {
+            throw new RuntimeException("Budget category is required");
+        }
     }
 
     // Scheduled job: auto-reset at start of each month (midnight on 1st)
