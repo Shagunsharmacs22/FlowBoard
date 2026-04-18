@@ -1,5 +1,6 @@
 package com.spendsmart.expense.service;
 
+import com.spendsmart.expense.client.BudgetClient;
 import com.spendsmart.expense.entity.Expense;
 import com.spendsmart.expense.repository.ExpenseRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,9 +17,14 @@ public class ExpenseServiceImpl implements ExpenseService {
     @Autowired
     private ExpenseRepository expenseRepository;
 
+    @Autowired
+    private BudgetClient budgetClient;
+
     @Override
     public Expense addExpense(Expense expense) {
-        return expenseRepository.save(expense);
+        Expense savedExpense = expenseRepository.save(expense);
+        syncBudgetSpent(savedExpense.getUserId(), savedExpense.getCategoryId(), savedExpense.getAmount());
+        return savedExpense;
     }
 
     @Override
@@ -51,6 +57,9 @@ public class ExpenseServiceImpl implements ExpenseService {
         Expense existing = expenseRepository.findByExpenseId(expenseId)
                 .orElseThrow(() -> new RuntimeException("Expense not found with id: " + expenseId));
 
+        Long previousCategoryId = existing.getCategoryId();
+        double previousAmount = existing.getAmount();
+
         if (updatedExpense.getTitle() != null)         existing.setTitle(updatedExpense.getTitle());
         if (updatedExpense.getAmount() > 0)            existing.setAmount(updatedExpense.getAmount());
         if (updatedExpense.getCurrency() != null)      existing.setCurrency(updatedExpense.getCurrency());
@@ -60,16 +69,27 @@ public class ExpenseServiceImpl implements ExpenseService {
         if (updatedExpense.getNotes() != null)         existing.setNotes(updatedExpense.getNotes());
         if (updatedExpense.getReceiptUrl() != null)    existing.setReceiptUrl(updatedExpense.getReceiptUrl());
         existing.setRecurring(updatedExpense.isRecurring());
-        if (updatedExpense.getCategoryId() > 0)        existing.setCategoryId(updatedExpense.getCategoryId());
+        if (updatedExpense.getCategoryId() != null)    existing.setCategoryId(updatedExpense.getCategoryId());
 
-        return expenseRepository.save(existing);
+        Expense savedExpense = expenseRepository.save(existing);
+
+        if (previousCategoryId != null && previousCategoryId.equals(savedExpense.getCategoryId())) {
+            double delta = savedExpense.getAmount() - previousAmount;
+            syncBudgetSpent(savedExpense.getUserId(), savedExpense.getCategoryId(), delta);
+        } else {
+            syncBudgetSpent(savedExpense.getUserId(), previousCategoryId, -previousAmount);
+            syncBudgetSpent(savedExpense.getUserId(), savedExpense.getCategoryId(), savedExpense.getAmount());
+        }
+
+        return savedExpense;
     }
 
     @Override
     @Transactional
     public void deleteExpense(Long expenseId) {
-        expenseRepository.findByExpenseId(expenseId)
+        Expense existing = expenseRepository.findByExpenseId(expenseId)
                 .orElseThrow(() -> new RuntimeException("Expense not found with id: " + expenseId));
+        syncBudgetSpent(existing.getUserId(), existing.getCategoryId(), -existing.getAmount());
         expenseRepository.deleteByExpenseId(expenseId);
     }
 
@@ -91,5 +111,9 @@ public class ExpenseServiceImpl implements ExpenseService {
     @Override
     public List<Expense> searchExpenses(Long userId, String keyword) {
         return expenseRepository.searchByKeyword(userId, keyword);
+    }
+
+    private void syncBudgetSpent(Long userId, Long categoryId, double amountDelta) {
+        budgetClient.updateSpentAmount(userId, categoryId, amountDelta);
     }
 }

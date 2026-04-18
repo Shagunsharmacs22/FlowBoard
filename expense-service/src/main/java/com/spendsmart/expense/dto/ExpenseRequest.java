@@ -16,6 +16,7 @@ public class ExpenseRequest {
     @NotNull(message = "User ID is required")
     private Long userId;
 
+    @NotNull(message = "Category is required")
     private Long categoryId;
 
     @NotBlank(message = "Title is required")
