@@ -24,8 +24,8 @@ category:
 
 app:
   google:
-    client-id: 823065491927-ofmj596aj7qjl4voapnnqm9jtq33981a.apps.googleusercontent.com
-    client-secret: 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
+    client-id: ${GOOGLE_CLIENT_ID:}
+    client-secret: ${GOOGLE_CLIENT_SECRET:}
   cors:
     allowed-origins:
       - http://localhost:3000
