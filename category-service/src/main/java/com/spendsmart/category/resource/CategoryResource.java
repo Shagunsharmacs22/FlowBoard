@@ -102,6 +102,16 @@ public class CategoryResource {
     }
 
     /**
+     * POST /categories/user/{userId}/defaults
+     * Seed default categories for a newly registered user.
+     */
+    @PostMapping("/user/{userId}/defaults")
+    public ResponseEntity<Void> initDefaults(@PathVariable Long userId) {
+        categoryService.initDefaultCategories(userId);
+        return ResponseEntity.ok().build();
+    }
+
+    /**
      * PUT /categories/{categoryId}/budget
      * Set a budget limit on a category.
      * Query param: amount
