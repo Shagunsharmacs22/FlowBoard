@@ -1,6 +1,7 @@
 package com.spendsmart.notification.resource;
 
 
+import com.spendsmart.notification.dto.NotificationRequest;
 import com.spendsmart.notification.entity.Notification;
 import com.spendsmart.notification.service.NotifService;
 import lombok.RequiredArgsConstructor;
@@ -15,6 +16,22 @@ import java.util.List;
 public class NotifResource {
 
     private final NotifService service;
+
+    @PostMapping
+    public ResponseEntity<?> create(@RequestBody NotificationRequest request) {
+        Notification notification = new Notification();
+        notification.setRecipientId(request.getRecipientId());
+        notification.setType(request.getType());
+        notification.setSeverity(request.getSeverity());
+        notification.setTitle(request.getTitle());
+        notification.setMessage(request.getMessage());
+        notification.setRelatedId(request.getRelatedId());
+        notification.setRelatedType(request.getRelatedType());
+        notification.setRead(Boolean.TRUE.equals(request.getRead()));
+        notification.setAcknowledged(Boolean.TRUE.equals(request.getAcknowledged()));
+        service.send(notification);
+        return ResponseEntity.ok("Sent");
+    }
 
     @GetMapping("/{recipientId}")
     public List<Notification> getByRecipient(@PathVariable Long recipientId) {
@@ -51,7 +68,7 @@ public class NotifResource {
     }
 
     @PostMapping("/bulk")
-    public ResponseEntity<?> sendBulk(@RequestBody List<Integer> users,
+    public ResponseEntity<?> sendBulk(@RequestBody List<Long> users,
                                       @RequestParam String title,
                                       @RequestParam String message) {
         service.sendBulk(users, title, message);
