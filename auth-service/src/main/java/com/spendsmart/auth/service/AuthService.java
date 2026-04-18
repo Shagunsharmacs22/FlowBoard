@@ -2,6 +2,7 @@ package com.spendsmart.auth.service;
 
 import com.spendsmart.auth.entity.User;
 import java.util.List;
+import java.util.Optional;
 
 public interface AuthService {
 
@@ -20,6 +21,8 @@ public interface AuthService {
     User getUserById(Long userId);
 
     User getUserByEmail(String email);
+
+    Optional<User> findOptionalUserByEmail(String email);
 
     List<User> getAllUsers();
 

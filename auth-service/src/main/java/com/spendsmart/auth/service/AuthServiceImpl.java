@@ -1,5 +1,6 @@
 package com.spendsmart.auth.service;
 
+import com.spendsmart.auth.client.CategoryClient;
 import com.spendsmart.auth.config.JwtUtil;
 import com.spendsmart.auth.entity.User;
 import com.spendsmart.auth.repository.UserRepository;
@@ -7,6 +8,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 
 @Service
 public class AuthServiceImpl implements AuthService {
@@ -24,6 +27,9 @@ public class AuthServiceImpl implements AuthService {
     @Autowired
     private TokenBlacklistService tokenBlacklistService;
 
+    @Autowired
+    private CategoryClient categoryClient;
+
     // ── Core Auth ──────────────────────────────────────────────────────────────
 
     @Override
@@ -31,9 +37,23 @@ public class AuthServiceImpl implements AuthService {
         if (userRepository.existsByEmail(user.getEmail())) {
             throw new RuntimeException("Email already registered");
         }
-        user.setPasswordHash(passwordEncoder.encode(user.getPasswordHash()));
+        boolean googleUser = user.getProvider() == User.Provider.GOOGLE;
+        if (googleUser) {
+            user.setPasswordHash(passwordEncoder.encode(UUID.randomUUID().toString()));
+        } else if (user.getPasswordHash() == null || user.getPasswordHash().isBlank()) {
+            throw new RuntimeException("Password is required");
+        } else {
+            user.setPasswordHash(passwordEncoder.encode(user.getPasswordHash()));
+        }
         user.setIsActive(true);
-        return userRepository.save(user);
+        User savedUser = userRepository.save(user);
+        try {
+            categoryClient.initDefaultCategories(savedUser.getUserId());
+            return savedUser;
+        } catch (RuntimeException ex) {
+            userRepository.deleteById(savedUser.getUserId());
+            throw new RuntimeException("User registration failed while creating default categories", ex);
+        }
     }
 
     /**
@@ -95,6 +115,11 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
+    public Optional<User> findOptionalUserByEmail(String email) {
+        return userRepository.findByEmail(email);
+    }
+
+    @Override
     public List<User> getAllUsers() {
         return userRepository.findAll();
     }
@@ -108,6 +133,7 @@ public class AuthServiceImpl implements AuthService {
         if (updatedUser.getAvatarUrl() != null) existing.setAvatarUrl(updatedUser.getAvatarUrl());
         if (updatedUser.getBio() != null)       existing.setBio(updatedUser.getBio());
         if (updatedUser.getTimezone() != null)  existing.setTimezone(updatedUser.getTimezone());
+        if (updatedUser.getProvider() != null)  existing.setProvider(updatedUser.getProvider());
         return userRepository.save(existing);
     }
 

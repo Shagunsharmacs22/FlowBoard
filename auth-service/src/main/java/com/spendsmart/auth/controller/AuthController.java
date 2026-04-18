@@ -4,12 +4,14 @@ import com.spendsmart.auth.config.JwtUtil;
 import com.spendsmart.auth.dto.*;
 import com.spendsmart.auth.entity.User;
 import com.spendsmart.auth.service.AuthService;
+import com.spendsmart.auth.service.GoogleOAuthService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * AuthResource — REST controller
@@ -17,6 +19,7 @@ import java.util.Map;
  * Endpoints (requirement-aligned):
  *   POST   /auth/register
  *   POST   /auth/login
+ *   POST   /auth/login/google         (NEW - Google OAuth)
  *   POST   /auth/logout
  *   POST   /auth/refresh
  *   GET    /auth/profile/{id}
@@ -36,6 +39,14 @@ public class AuthController {
 
     @Autowired
     private JwtUtil jwtUtil;
+
+    @Autowired
+    private GoogleOAuthService googleOAuthService;
+
+    @GetMapping("/google/config")
+    public ResponseEntity<GoogleOAuthConfigResponse> googleOAuthConfig() {
+        return ResponseEntity.ok(new GoogleOAuthConfigResponse(googleOAuthService.getClientId()));
+    }
 
     // ── Register ────────────────────────────────────────────────
     @PostMapping("/register")
@@ -58,6 +69,47 @@ public class AuthController {
         return ResponseEntity.ok(new AuthResponse(token, user.getUserId(), user.getEmail(), user.getFullName()));
     }
 
+    // ✅ NEW — Google OAuth Login
+    @PostMapping("/login/google")
+    public ResponseEntity<?> loginWithGoogle(@RequestBody GoogleLoginRequest req) {
+        try {
+            // Exchange authorization code for token
+            GoogleTokenResponse googleToken = googleOAuthService.exchangeCodeForToken(
+                req.getCode(),
+                req.getCodeVerifier(),
+                req.getRedirectUri()
+            );
+
+            // Check if user exists
+            User user = authService.findOptionalUserByEmail(googleToken.getEmail()).orElse(null);
+            
+            if (user == null) {
+                // Create new user with GOOGLE provider
+                user = User.builder()
+                        .email(googleToken.getEmail())
+                        .fullName(googleToken.getFullName())
+                        .avatarUrl(googleToken.getPicture())
+                        .provider(User.Provider.GOOGLE)
+                        .isActive(true)
+                        .build();
+                user = authService.register(user);
+            } else if (user.getProvider() == null || user.getProvider() == User.Provider.LOCAL) {
+                // Update existing user to also support Google login
+                user.setProvider(User.Provider.GOOGLE);
+                user.setAvatarUrl(googleToken.getPicture());
+                user = authService.updateProfile(user.getUserId(), user);
+            }
+
+            // Generate JWT token
+            String token = jwtUtil.generateToken(user.getEmail());
+
+            return ResponseEntity.ok(new AuthResponse(token, user.getUserId(), user.getEmail(), user.getFullName()));
+
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(Map.of("message", e.getMessage()));
+        }
+    }
+
     // ✅ NEW — Logout
     @PostMapping("/logout")
     public ResponseEntity<Map<String, String>> logout(@RequestHeader("Authorization") String authHeader) {
@@ -76,20 +128,20 @@ public class AuthController {
 
     // ── Profile GET ──────────────────────────────────────────────
     @GetMapping("/profile/{id}")
-    public ResponseEntity<User> getProfile(@PathVariable Long id) {
-        return ResponseEntity.ok(authService.getUserById(id));
+    public ResponseEntity<UserProfileResponse> getProfile(@PathVariable Long id) {
+        return ResponseEntity.ok(toUserProfileResponse(authService.getUserById(id)));
     }
 
     // ── Profile PUT ──────────────────────────────────────────────
     @PutMapping("/profile/{id}")
-    public ResponseEntity<User> updateProfile(@PathVariable Long id,
-                                               @RequestBody UpdateProfileRequest req) {
+    public ResponseEntity<UserProfileResponse> updateProfile(@PathVariable Long id,
+                                                             @RequestBody UpdateProfileRequest req) {
         User patch = new User();
         patch.setFullName(req.getFullName());
         patch.setAvatarUrl(req.getAvatarUrl());
         patch.setBio(req.getBio());
         patch.setTimezone(req.getTimezone());
-        return ResponseEntity.ok(authService.updateProfile(id, patch));
+        return ResponseEntity.ok(toUserProfileResponse(authService.updateProfile(id, patch)));
     }
 
     // ✅ NEW — Change Password (was missing proper endpoint)
@@ -125,8 +177,12 @@ public class AuthController {
 
     // ── Admin: all users ──────────────────────────────────────────
     @GetMapping("/users")
-    public ResponseEntity<List<User>> getAllUsers() {
-        return ResponseEntity.ok(authService.getAllUsers());
+    public ResponseEntity<List<UserProfileResponse>> getAllUsers() {
+        return ResponseEntity.ok(
+                authService.getAllUsers().stream()
+                        .map(this::toUserProfileResponse)
+                        .collect(Collectors.toList())
+        );
     }
 
     // ── Helper ───────────────────────────────────────────────────
@@ -135,5 +191,19 @@ public class AuthController {
             throw new RuntimeException("Authorization header missing or malformed");
         }
         return authHeader.substring(7);
+    }
+
+    private UserProfileResponse toUserProfileResponse(User user) {
+        return UserProfileResponse.builder()
+                .userId(user.getUserId())
+                .fullName(user.getFullName())
+                .email(user.getEmail())
+                .currency(user.getCurrency())
+                .timezone(user.getTimezone())
+                .avatarUrl(user.getAvatarUrl())
+                .monthlyBudget(user.getMonthlyBudget())
+                .bio(user.getBio())
+                .isActive(user.getIsActive())
+                .build();
     }
 }
