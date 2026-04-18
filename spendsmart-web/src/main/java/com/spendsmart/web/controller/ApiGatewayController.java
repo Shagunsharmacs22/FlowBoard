@@ -1,9 +1,12 @@
 package com.spendsmart.web.controller;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpMethod;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.client.RestClientException;
+import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.beans.factory.annotation.Autowired;
 import lombok.extern.slf4j.Slf4j;
 
@@ -43,6 +46,51 @@ public class ApiGatewayController {
         } catch (RestClientException e) {
             log.error("Error fetching total income", e);
             return ResponseEntity.internalServerError().body("Error fetching total: " + e.getMessage());
+        }
+    }
+
+    @GetMapping("/incomes/range")
+    public ResponseEntity<?> getIncomesByRange(@RequestParam Long userId,
+                                               @RequestParam String start,
+                                               @RequestParam String end) {
+        try {
+            return restTemplate.getForEntity(
+                    "http://localhost:8083/api/incomes/range?userId=" + userId + "&start=" + start + "&end=" + end,
+                    Object.class
+            );
+        } catch (RestClientException e) {
+            log.error("Error fetching incomes by range", e);
+            return ResponseEntity.internalServerError().body("Error fetching incomes by range: " + e.getMessage());
+        }
+    }
+
+    @GetMapping("/incomes/month")
+    public ResponseEntity<?> getIncomesByMonth(@RequestParam Long userId,
+                                               @RequestParam int month,
+                                               @RequestParam int year) {
+        try {
+            return restTemplate.getForEntity(
+                    "http://localhost:8083/api/incomes/month?userId=" + userId + "&month=" + month + "&year=" + year,
+                    Object.class
+            );
+        } catch (RestClientException e) {
+            log.error("Error fetching incomes by month", e);
+            return ResponseEntity.internalServerError().body("Error fetching incomes by month: " + e.getMessage());
+        }
+    }
+
+    @GetMapping("/incomes/total/month")
+    public ResponseEntity<?> getIncomeTotalByMonth(@RequestParam Long userId,
+                                                   @RequestParam int month,
+                                                   @RequestParam int year) {
+        try {
+            return restTemplate.getForEntity(
+                    "http://localhost:8083/api/incomes/total/month?userId=" + userId + "&month=" + month + "&year=" + year,
+                    Object.class
+            );
+        } catch (RestClientException e) {
+            log.error("Error fetching income total by month", e);
+            return ResponseEntity.internalServerError().body("Error fetching income total by month: " + e.getMessage());
         }
     }
 
@@ -116,6 +164,50 @@ public class ApiGatewayController {
         } catch (RestClientException e) {
             log.error("Error fetching total expenses", e);
             return ResponseEntity.internalServerError().body("Error fetching total: " + e.getMessage());
+        }
+    }
+
+    @GetMapping("/expenses/user/{userId}/range")
+    public ResponseEntity<?> getExpensesByRange(@PathVariable Long userId,
+                                                @RequestParam String start,
+                                                @RequestParam String end) {
+        try {
+            return restTemplate.getForEntity(
+                    "http://localhost:8082/api/expenses/user/" + userId + "/range?start=" + start + "&end=" + end,
+                    Object.class
+            );
+        } catch (RestClientException e) {
+            log.error("Error fetching expenses by range", e);
+            return ResponseEntity.internalServerError().body("Error fetching expenses by range: " + e.getMessage());
+        }
+    }
+
+    @GetMapping("/expenses/user/{userId}/month")
+    public ResponseEntity<?> getExpensesByMonth(@PathVariable Long userId,
+                                                @RequestParam int month,
+                                                @RequestParam int year) {
+        try {
+            return restTemplate.getForEntity(
+                    "http://localhost:8082/api/expenses/user/" + userId + "/month?month=" + month + "&year=" + year,
+                    Object.class
+            );
+        } catch (RestClientException e) {
+            log.error("Error fetching expenses by month", e);
+            return ResponseEntity.internalServerError().body("Error fetching expenses by month: " + e.getMessage());
+        }
+    }
+
+    @GetMapping("/expenses/user/{userId}/search")
+    public ResponseEntity<?> searchExpenses(@PathVariable Long userId,
+                                            @RequestParam String keyword) {
+        try {
+            return restTemplate.getForEntity(
+                    "http://localhost:8082/api/expenses/user/" + userId + "/search?keyword=" + keyword,
+                    Object.class
+            );
+        } catch (RestClientException e) {
+            log.error("Error searching expenses", e);
+            return ResponseEntity.internalServerError().body("Error searching expenses: " + e.getMessage());
         }
     }
 
@@ -215,8 +307,12 @@ public class ApiGatewayController {
     @PutMapping("/budgets/{id}")
     public ResponseEntity<?> updateBudget(@PathVariable Long id, @RequestBody Object budget) {
         try {
-            restTemplate.put("http://localhost:8085/api/budgets/" + id, budget);
-            return ResponseEntity.ok().build();
+            return restTemplate.exchange(
+                    "http://localhost:8085/api/budgets/" + id,
+                    HttpMethod.PUT,
+                    new HttpEntity<>(budget),
+                    Object.class
+            );
         } catch (RestClientException e) {
             log.error("Error updating budget", e);
             return ResponseEntity.internalServerError().body("Error updating budget: " + e.getMessage());
@@ -231,6 +327,41 @@ public class ApiGatewayController {
         } catch (RestClientException e) {
             log.error("Error deleting budget", e);
             return ResponseEntity.internalServerError().body("Error deleting budget: " + e.getMessage());
+        }
+    }
+
+    @GetMapping("/budgets/user/{userId}/alerts")
+    public ResponseEntity<?> getBudgetAlerts(@PathVariable Long userId) {
+        try {
+            return restTemplate.getForEntity("http://localhost:8085/api/budgets/user/" + userId + "/alerts", Object.class);
+        } catch (RestClientException e) {
+            log.error("Error fetching budget alerts", e);
+            return ResponseEntity.internalServerError().body("Error fetching budget alerts: " + e.getMessage());
+        }
+    }
+
+    @PostMapping("/budgets/{id}/reset")
+    public ResponseEntity<?> resetBudget(@PathVariable Long id) {
+        try {
+            return restTemplate.postForEntity("http://localhost:8085/api/budgets/" + id + "/reset", null, Object.class);
+        } catch (RestClientException e) {
+            log.error("Error resetting budget", e);
+            return ResponseEntity.internalServerError().body("Error resetting budget: " + e.getMessage());
+        }
+    }
+
+    @PatchMapping("/budgets/{id}/spent")
+    public ResponseEntity<?> updateBudgetSpent(@PathVariable Long id, @RequestParam double amount) {
+        try {
+            return restTemplate.exchange(
+                    "http://localhost:8085/api/budgets/" + id + "/spent?amount=" + amount,
+                    HttpMethod.PATCH,
+                    HttpEntity.EMPTY,
+                    Object.class
+            );
+        } catch (RestClientException e) {
+            log.error("Error updating budget spent amount", e);
+            return ResponseEntity.internalServerError().body("Error updating budget spent amount: " + e.getMessage());
         }
     }
 
@@ -392,6 +523,36 @@ public class ApiGatewayController {
         }
     }
 
+    @PutMapping("/notifications/read/all/{recipientId}")
+    public ResponseEntity<?> markAllNotificationsRead(@PathVariable Long recipientId) {
+        try {
+            return restTemplate.exchange(
+                    "http://localhost:8088/api/notifications/read/all/" + recipientId,
+                    HttpMethod.PUT,
+                    HttpEntity.EMPTY,
+                    Object.class
+            );
+        } catch (RestClientException e) {
+            log.error("Error marking all notifications as read", e);
+            return ResponseEntity.internalServerError().body("Error updating notifications: " + e.getMessage());
+        }
+    }
+
+    @PutMapping("/notifications/ack/{id}")
+    public ResponseEntity<?> acknowledgeNotification(@PathVariable Long id) {
+        try {
+            return restTemplate.exchange(
+                    "http://localhost:8088/api/notifications/ack/" + id,
+                    HttpMethod.PUT,
+                    HttpEntity.EMPTY,
+                    Object.class
+            );
+        } catch (RestClientException e) {
+            log.error("Error acknowledging notification", e);
+            return ResponseEntity.internalServerError().body("Error acknowledging notification: " + e.getMessage());
+        }
+    }
+
     @DeleteMapping("/notifications/{id}")
     public ResponseEntity<?> deleteNotification(@PathVariable Long id) {
         try {
@@ -400,6 +561,33 @@ public class ApiGatewayController {
         } catch (RestClientException e) {
             log.error("Error deleting notification", e);
             return ResponseEntity.internalServerError().body("Error deleting notification: " + e.getMessage());
+        }
+    }
+
+    @PostMapping("/notifications/bulk")
+    public ResponseEntity<?> sendBulkNotification(@RequestBody Object userIds,
+                                                  @RequestParam String title,
+                                                  @RequestParam String message) {
+        try {
+            return restTemplate.exchange(
+                    "http://localhost:8088/api/notifications/bulk?title=" + title + "&message=" + message,
+                    HttpMethod.POST,
+                    new HttpEntity<>(userIds),
+                    Object.class
+            );
+        } catch (RestClientException e) {
+            log.error("Error sending bulk notification", e);
+            return ResponseEntity.internalServerError().body("Error sending bulk notification: " + e.getMessage());
+        }
+    }
+
+    @GetMapping("/notifications/all")
+    public ResponseEntity<?> getAllNotifications() {
+        try {
+            return restTemplate.getForEntity("http://localhost:8088/api/notifications/all", Object.class);
+        } catch (RestClientException e) {
+            log.error("Error fetching all notifications", e);
+            return ResponseEntity.internalServerError().body("Error fetching all notifications: " + e.getMessage());
         }
     }
 
@@ -483,11 +671,38 @@ public class ApiGatewayController {
         }
     }
 
+    @GetMapping("/auth/google/config")
+    public ResponseEntity<?> getGoogleConfig() {
+        try {
+            return restTemplate.getForEntity("http://localhost:8081/api/auth/google/config", Object.class);
+        } catch (RestClientException e) {
+            log.error("Error fetching Google OAuth config", e);
+            return ResponseEntity.internalServerError().body("Error fetching Google OAuth config: " + e.getMessage());
+        }
+    }
+
+    @PostMapping("/auth/login/google")
+    public ResponseEntity<?> loginWithGoogle(@RequestBody Object request) {
+        try {
+            return restTemplate.postForEntity("http://localhost:8081/api/auth/login/google", request, Object.class);
+        } catch (HttpStatusCodeException e) {
+            log.error("Google login failed in auth-service", e);
+            return ResponseEntity.status(e.getStatusCode()).body(e.getResponseBodyAsString());
+        } catch (RestClientException e) {
+            log.error("Error logging in with Google", e);
+            return ResponseEntity.internalServerError().body("Error logging in with Google: " + e.getMessage());
+        }
+    }
+
     @PutMapping("/auth/profile/{id}")
     public ResponseEntity<?> updateProfile(@PathVariable Long id, @RequestBody Object request) {
         try {
-            restTemplate.put("http://localhost:8081/api/auth/profile/" + id, request);
-            return ResponseEntity.ok().build();
+            return restTemplate.exchange(
+                    "http://localhost:8081/api/auth/profile/" + id,
+                    HttpMethod.PUT,
+                    new HttpEntity<>(request),
+                    Object.class
+            );
         } catch (RestClientException e) {
             log.error("Error updating profile", e);
             return ResponseEntity.internalServerError().body("Error updating profile: " + e.getMessage());
@@ -502,6 +717,51 @@ public class ApiGatewayController {
         } catch (RestClientException e) {
             log.error("Error changing password", e);
             return ResponseEntity.internalServerError().body("Error changing password: " + e.getMessage());
+        }
+    }
+
+    @PutMapping("/auth/currency/{id}")
+    public ResponseEntity<?> updateCurrency(@PathVariable Long id, @RequestParam String currency) {
+        try {
+            return restTemplate.exchange(
+                    "http://localhost:8081/api/auth/currency/" + id + "?currency=" + currency,
+                    HttpMethod.PUT,
+                    HttpEntity.EMPTY,
+                    Object.class
+            );
+        } catch (RestClientException e) {
+            log.error("Error updating currency", e);
+            return ResponseEntity.internalServerError().body("Error updating currency: " + e.getMessage());
+        }
+    }
+
+    @PutMapping("/auth/budget/{id}")
+    public ResponseEntity<?> updateBudget(@PathVariable Long id, @RequestParam Double budget) {
+        try {
+            return restTemplate.exchange(
+                    "http://localhost:8081/api/auth/budget/" + id + "?budget=" + budget,
+                    HttpMethod.PUT,
+                    HttpEntity.EMPTY,
+                    Object.class
+            );
+        } catch (RestClientException e) {
+            log.error("Error updating monthly budget", e);
+            return ResponseEntity.internalServerError().body("Error updating monthly budget: " + e.getMessage());
+        }
+    }
+
+    @DeleteMapping("/auth/deactivate/{id}")
+    public ResponseEntity<?> deactivateAccount(@PathVariable Long id) {
+        try {
+            return restTemplate.exchange(
+                    "http://localhost:8081/api/auth/deactivate/" + id,
+                    HttpMethod.DELETE,
+                    HttpEntity.EMPTY,
+                    Object.class
+            );
+        } catch (RestClientException e) {
+            log.error("Error deactivating account", e);
+            return ResponseEntity.internalServerError().body("Error deactivating account: " + e.getMessage());
         }
     }
 }
